@@ -6,6 +6,8 @@ import Register from "./pages/Register";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext, AuthContextProvider } from "./context/AuthContext"
+import MusicPreferences from "./pages/MusicPreferences";
+import SearchPage from "./pages/SearchPage";
 
 function App() {
 
@@ -32,6 +34,8 @@ function App() {
             />
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
+            <Route path="music-preferences" element={<MusicPreferences />} />
+            <Route path="SearchPage" element={<SearchPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

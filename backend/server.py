@@ -11,9 +11,10 @@ app.add_middleware(
     allow_headers=["*"],  # Allow all headers
 )
 
+token = get_token()
+
 @app.get("/artists/{artist_name}")
 def get_image(artist_name: str):
-    token = get_token()
     artist_id = get_artist_id(token, artist_name)
     image_url = get_artist_image(token, artist_id)
     print("Hello", image_url)
