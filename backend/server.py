@@ -1,4 +1,5 @@
 import fastapi
+from pydantic import BaseModel
 import uvicorn
 from spotify_api import get_token, get_artist_id, get_artist_image
 from fastapi.middleware.cors import CORSMiddleware
@@ -11,6 +12,11 @@ app.add_middleware(
     allow_headers=["*"],  # Allow all headers
 )
 
+#define a pydantic model for user-preferences regarding his favorite artists and genres
+class UserPreferences(BaseModel):
+    favorite_artists: list
+    favorite_genres: list
+
 token = get_token()
 
 @app.get("/artists/{artist_name}")
@@ -21,4 +27,11 @@ def get_image(artist_name: str):
     return {
         "artist_name" : artist_name,
         "image_url" : image_url
+    }
+
+@app.get("/user_preferences")
+def get_coldstart_reco(user_preferences: UserPreferences):
+    
+    return {
+        "coldstart_reco" : "Coldstart Reco"
     }
