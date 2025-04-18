@@ -1,41 +1,29 @@
-// src/pages/Home.js
-
+// src/pages/Home.jsx
 import React from 'react';
-import '../css/Home.css';
+import TopBar from '../components/home/TopBar';
+import SideBar from '../components/home/SideBar';
+import MainArea from '../components/home/MainArea';
+import Footer from '../components/home/Footer';
+import '../css/Home.css'; // Central CSS for global layout if needed
+import { useEffect } from 'react';
 
 const Home = () => {
+  useEffect(() => {
+    // This is where you can add any side effects or data fetching
+    // For example, fetching user data or recommendations
+    console.log('Home component mounted');
+  }, []);
   return (
     <div className="home-page">
-      <header className="header">
-        <h1>Welcome to My Music App</h1>
-        <nav className="nav">
-          <a href="#discover">Discover</a>
-          <a href="#top-charts">Top Charts</a>
-          <a href="#genres">Genres</a>
-          <a href="#playlists">Playlists</a>
-        </nav>
-      </header>
-      <main className="main-content">
-        <section id="discover">
-          <h2>Discover New Music</h2>
-          <p>Explore new songs and artists recommended just for you.</p>
-        </section>
-        <section id="top-charts">
-          <h2>Top Charts</h2>
-          <p>Check out the latest hits and trending music.</p>
-        </section>
-        <section id="genres">
-          <h2>Genres</h2>
-          <p>Browse music by your favorite genres.</p>
-        </section>
-        <section id="playlists">
-          <h2>Playlists</h2>
-          <p>Create and manage your own playlists.</p>
-        </section>
-      </main>
-      <footer className="footer">
-        <p>&copy; 2024 My Music App. All rights reserved.</p>
-      </footer>
+      <TopBar />
+      
+      {/* Content Wrapper to hold Sidebar and Main Content side-by-side */}
+      <div className="content-wrapper">
+        <SideBar />
+        <MainArea />
+      </div>
+
+      <Footer />
     </div>
   );
 };

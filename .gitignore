@@ -24,3 +24,6 @@ yarn-error.log*
 
 # datasets
 /datasets
+
+# csv files
+*.csv

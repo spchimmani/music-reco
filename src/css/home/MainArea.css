@@ -1,0 +1,84 @@
+/* MainArea.css */
+.main-content {
+  flex: 1;
+  padding: 20px;
+  background-color: #121212;
+  color: #e0e0e0;
+}
+
+.cold-start {
+  margin-bottom: 30px;
+}
+
+.cold-start h2 {
+  font-size: 1.7rem;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #333;
+  padding-bottom: 5px;
+}
+
+/* Updated recommendation row for individual horizontal scrolling */
+.recommendation-row {
+  display: flex;
+  gap: 15px;
+  overflow-x: auto;
+  white-space: nowrap;               /* Ensure items remain in a single line */
+  padding-bottom: 10px;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on touch devices */
+}
+
+/* Custom scrollbar styling for WebKit browsers */
+.recommendation-row::-webkit-scrollbar {
+  height: 8px;
+}
+
+.recommendation-row::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.recommendation-row::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.recommendation-card {
+  background-color: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 8px;
+  flex: 0 0 auto; /* Prevent cards from shrinking or expanding */
+  width: 150px;
+  text-align: center;
+  padding: 10px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.recommendation-card h3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* limits to 2 lines */
+  line-clamp: 2; /* standard line clamp property for compatibility */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.recommendation-image {
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  transition: opacity 0.3s ease;
+}
+
+.recommendation-image:hover {
+  opacity: 0.9;
+}
+
+.recommendation-row {
+  display: flex;
+  gap: 15px;
+  overflow-x: auto;
+  white-space: nowrap;
+  padding-bottom: 10px;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}

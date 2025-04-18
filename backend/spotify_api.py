@@ -48,9 +48,9 @@ def get_artist_id(token, artist_name):
     json_response = json.loads(response.content)
     return json_response["artists"]["items"][0]["id"]
 
-def get_tracks(artist_id, headers):
+def get_artist_top_tracks(artist_id, token):
     url = f"https://api.spotify.com/v1/artists/{artist_id}/top-tracks?market=IN"
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=get_auth_header(token))
 
     if response.status_code != 200:
         print("Error: ", response.status_code)
@@ -84,9 +84,53 @@ def get_artist_image(token, artist_id):
     json_response = json.loads(response.content)
     return json_response["images"][0]["url"]
 
+def get_track_info(name, token):
+    url = f"https://api.spotify.com/v1/search?q={name}&type=track"
+    response = requests.get(url, headers=get_auth_header(token))
 
-token = get_token() 
-print(get_artist_image(token, get_artist_id(token, "Arijit Singh")))
+    if response.status_code != 200:
+        print("Error: ", response.status_code)
+        return None
+    
+    json_response = json.loads(response.content)
+    return json_response["tracks"]["items"]
 
+def get_global_top_tracks(token):
+    def parse_top_tracks(response_json):
+        tracks = []
+        for item in response_json["items"]:
+            track = item.get("track")
+            if track:
+                name = track.get("name")
+                artists = [artist["name"] for artist in track.get("artists", [])]
+                url = track.get("external_urls", {}).get("spotify")
+                tracks.append({
+                    "name": name,
+                    "artists": artists,
+                    "url": url
+                })
+        return tracks
+    # Correct playlist ID for Spotify's "Top 50 - Global"
+    playlist_id = "37i9dQZEVXbMDoHDwVN2tF"
+    url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks?market=US"
+    response = requests.get(url, headers=get_auth_header(token))
 
-
+    if response.status_code != 200:
+        print("Error:", response.status_code)
+        print("Response:", response.text)
+        return None
+    else:
+        json_response = json.loads(response.content)
+        tracks = parse_top_tracks(json_response)
+        for track in tracks:
+            print(f"Track Name: {track['name']}")
+            print(f"Artists: {', '.join(track['artists'])}")
+            print(f"URL: {track['url']}")
+            print()
+    return None
+    
+token = get_token()
+if token is None:
+    print("Failed to get token")
+else:
+    print(get_global_top_tracks(token))

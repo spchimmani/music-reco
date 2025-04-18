@@ -8,6 +8,7 @@ import { useContext } from "react";
 import { AuthContext, AuthContextProvider } from "./context/AuthContext"
 import MusicPreferences from "./pages/MusicPreferences";
 import SearchPage from "./pages/SearchPage";
+import { MusicPlayerProvider } from "./context/MusicPlayerContext";
 
 function App() {
 
@@ -22,22 +23,23 @@ function App() {
   return (
     <AuthContextProvider>
       <BrowserRouter>
-        <Routes>
-          <Route path="/">
+        <MusicPlayerProvider>
+          <Routes>
             <Route
-              index
+              path="/"
               element={
                 <ProtectedRoute>
                   <Home />
                 </ProtectedRoute>
               }
             />
-            <Route path="login" element={<Login />} />
-            <Route path="register" element={<Register />} />
-            <Route path="music-preferences" element={<MusicPreferences />} />
-            <Route path="SearchPage" element={<SearchPage />} />
-          </Route>
-        </Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/music-preferences" element={<MusicPreferences />} />
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/home" element={<Home />} />
+          </Routes>
+        </MusicPlayerProvider>
       </BrowserRouter>
     </AuthContextProvider>
   );
