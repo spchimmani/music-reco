@@ -49,7 +49,7 @@ function ModernMusicFooter() {
     let timer;
     if (isPlaying && currentTime < currentTrack.duration) {
       timer = setInterval(() => {
-        setCurrentTime((prev) => Math.min(prev + 1, currentTrack.duration));
+        setCurrentTime((prev) => Math.min(prev + 1000, currentTrack.duration));
       }, 1000);
     }
     return () => clearInterval(timer);
@@ -60,9 +60,10 @@ function ModernMusicFooter() {
   const progressPercent = (currentTime / currentTrack.duration) * 100;
 
   // Format time as m:ss
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
+  const formatTime = (milliseconds) => {
+    const totalSeconds = Math.round(milliseconds / 1000);
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = totalSeconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 

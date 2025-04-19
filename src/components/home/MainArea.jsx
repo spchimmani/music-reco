@@ -64,7 +64,12 @@ const MainArea = () => {
         <h2>Top Charts</h2>
         <div className="recommendation-row topcharts-row">
           {topCharts.map((item) => (
-            <div key={item.id} className="recommendation-card" onClick={() => playTrackWithQueue(item, topCharts.slice(topCharts.indexOf(item) + 1))}>
+            <div key={item.id} className="recommendation-card" onClick={() => playTrackWithQueue({
+              title: item.name,
+              artist: 'Unknown Artist',
+              albumArt: item.image,
+              duration: 180
+            })}>
               <img src={item.image} alt={item.name} className="recommendation-image" />
               <h3>{item.name}</h3>
             </div>
@@ -76,7 +81,12 @@ const MainArea = () => {
         <h2>Genre Recommendations</h2>
         <div className="recommendation-row genre-row">
           {genreRecs.map((item) => (
-            <div key={item.id} className="recommendation-card" onClick={() => playTrackWithQueue(item, genreRecs.slice(genreRecs.indexOf(item) + 1))}>
+            <div key={item.id} className="recommendation-card" onClick={() => playTrackWithQueue({
+              title: item.name,
+              artist: item.artist || 'Unknown Artist',
+              albumArt: item.image,
+              duration: item.duration || 180
+            })}>
               <img src={item.image} alt={item.name} className="recommendation-image" />
               <h3>{item.name}</h3>
             </div>
@@ -88,7 +98,12 @@ const MainArea = () => {
         <h2>Artist Recommendations</h2>
         <div className="recommendation-row artist-row">
           {artistRecs.map((item) => (
-            <div key={item.id} className="recommendation-card" onClick={() => playTrackWithQueue(item, artistRecs.slice(artistRecs.indexOf(item) + 1))}>
+            <div key={item.id} className="recommendation-card" onClick={() => playTrackWithQueue({
+              title: item.name,
+              artist: item.artist || 'Unknown Artist',
+              albumArt: item.image,
+              duration: item.duration || 180
+            })}>
               <img src={item.image} alt={item.name} className="recommendation-image" />
               <h3>{item.name}</h3>
             </div>

@@ -41,29 +41,22 @@ def get_coldstart_genre_reco(user_genres: List[str] = fastapi.Query(...)):
             df (pandas.DataFrame): DataFrame returned by get_user_genre_recommendations.
 
         Returns:
-            list: A list of dictionaries with keys 'id', 'name', 'image'
+            list: A list of dictionaries with keys 'id', 'name', 'image', 'artist', and 'duration'.
         """
         recommendations = []
 
         # Use enumerate with start=1 to generate a simple index for each recommendation.
         for idx, (_, row) in enumerate(df.iterrows(), start=1):
-            rec_name = row['name']
-            
-            # Retrieve artist id using the Spotify API.
-            artist_id = get_artist_id(token, row['artist'])
-            # Retrieve artist image URL using the Spotify API.
-            track_info = get_track_info(rec_name, token)
-            image_url = None
-            if track_info is None or len(track_info) == 0:
-                print(f"Error: No track info found for artist {row['artist']}")
-                continue
-            else:
-                image_url = track_info[0]['album']['images'][0]['url']
-            
+            # spotify track id can be extracted from the row -- row['spotify_id']
+            # spotidy preview url can be extracted from the row -- row['spotify_preview_url'] but it is not working
+            spotify_track_id = row['spotify_id']
+            track_info = get_track_info(spotify_track_id, token)
             recommendations.append({
                 'id': idx,           # Simple index starting at 1.
-                'name': rec_name,
-                'image': image_url
+                'name': row['name'],
+                'image': track_info["album"]["images"][0]["url"],  # Image URL from the track info.
+                'artist': row['artist'],
+                'duration': row['duration_ms'],  # Duration in milliseconds.
             })
         
         return recommendations
@@ -89,18 +82,14 @@ def get_coldstart_artist_reco(user_artists: List[str] = fastapi.Query(...)):
             recos = [recos]
 
         for idx, rec in enumerate(recos, start=1):
-            # Extract the display name for the recommendation.
-            rec_name = rec.get("name")
-            # Use either 'artist_x' or 'artist_y' (depending on your logic, both are identical in the sample)
-            rec_artist = rec.get("artist_x") or rec.get("artist_y")
-            # Retrieve artist_id using the Spotify API helper function.
-            artist_id = get_artist_id(token, rec_artist)
-            # Retrieve image URL for the artist.
-            image_url = get_artist_image(token, artist_id)
+            spotify_track_id = rec['spotify_id']
+            track_info = get_track_info(spotify_track_id, token)
             recommendations.append({
                 "id": idx,       # Sequential index starting at 1.
-                "name": rec_name,
-                "image": image_url
+                "name": track_info["name"],
+                "image": track_info["album"]["images"][0]["url"],  # Image URL from the track info.
+                "duration": track_info["duration_ms"],  # Duration in milliseconds.
+                "artist": track_info["artists"][0]["name"],  # First artist name.
             })
         return recommendations
 

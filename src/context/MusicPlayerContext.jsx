@@ -14,9 +14,8 @@ export const MusicPlayerProvider = ({ children }) => {
   const [reaction, setReaction] = useState('none');
   const [currentTime, setCurrentTime] = useState(0);
 
-  const playTrackWithQueue = (selectedTrack, queueList) => {
+  const playTrackWithQueue = (selectedTrack) => {
     setCurrentTrack(selectedTrack);
-    setQueue(queueList);
     setIsPlaying(true);
     setReaction('none');
     setCurrentTime(0);

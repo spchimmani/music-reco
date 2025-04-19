@@ -84,7 +84,8 @@ def get_artist_image(token, artist_id):
     json_response = json.loads(response.content)
     return json_response["images"][0]["url"]
 
-def get_track_info(name, token):
+#  convert this into a search function
+def get_search_results(name, token):
     url = f"https://api.spotify.com/v1/search?q={name}&type=track"
     response = requests.get(url, headers=get_auth_header(token))
 
@@ -94,6 +95,17 @@ def get_track_info(name, token):
     
     json_response = json.loads(response.content)
     return json_response["tracks"]["items"]
+
+def get_track_info(track_id, token):
+    url = f"https://api.spotify.com/v1/tracks/{track_id}"
+    response = requests.get(url, headers=get_auth_header(token))
+
+    if response.status_code != 200:
+        print("Error: ", response.status_code)
+        return None
+    
+    json_response = json.loads(response.content)
+    return json_response
 
 def get_global_top_tracks(token):
     def parse_top_tracks(response_json):
