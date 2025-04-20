@@ -9,6 +9,7 @@ import { AuthContext, AuthContextProvider } from "./context/AuthContext"
 import MusicPreferences from "./pages/MusicPreferences";
 import SearchPage from "./pages/SearchPage";
 import { MusicPlayerProvider } from "./context/MusicPlayerContext";
+import Callback from "./pages/Callback";
 
 function App() {
 
@@ -38,6 +39,7 @@ function App() {
             <Route path="/music-preferences" element={<MusicPreferences />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/home" element={<Home />} />
+            <Route path="/callback" element={<Callback />} />
           </Routes>
         </MusicPlayerProvider>
       </BrowserRouter>

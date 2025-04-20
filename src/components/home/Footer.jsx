@@ -110,6 +110,9 @@ function ModernMusicFooter() {
           <button onClick={handleNext} style={styles.controlBtn}>
             ⏭
           </button>
+          <button onClick={() => setCurrentTime(0)} style={styles.controlBtn}>
+            🔁
+          </button>
         </div>
         <div style={styles.progressContainer}>
           <span style={styles.timeText}>{formatTime(currentTime)}</span>

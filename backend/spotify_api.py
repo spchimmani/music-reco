@@ -3,13 +3,14 @@ from dotenv import load_dotenv
 import os
 import requests
 import base64
+import urllib.parse
 load_dotenv()
 
-client_id = os.getenv("CLIENT_ID")
-client_secret = os.getenv("CLIENT_SECRET")
+spotify_client_id = os.getenv("CLIENT_ID")
+spotify_client_secret = os.getenv("CLIENT_SECRET")
 
 def get_token():
-    auth_string = f"{client_id}:{client_secret}"
+    auth_string = f"{spotify_client_id}:{spotify_client_secret}"
     auth_bytes = auth_string.encode('utf-8')
     auth_base64 = str(base64.b64encode(auth_bytes), "utf-8")
 
@@ -107,42 +108,21 @@ def get_track_info(track_id, token):
     json_response = json.loads(response.content)
     return json_response
 
-def get_global_top_tracks(token):
-    def parse_top_tracks(response_json):
-        tracks = []
-        for item in response_json["items"]:
-            track = item.get("track")
-            if track:
-                name = track.get("name")
-                artists = [artist["name"] for artist in track.get("artists", [])]
-                url = track.get("external_urls", {}).get("spotify")
-                tracks.append({
-                    "name": name,
-                    "artists": artists,
-                    "url": url
-                })
-        return tracks
-    # Correct playlist ID for Spotify's "Top 50 - Global"
-    playlist_id = "37i9dQZEVXbMDoHDwVN2tF"
-    url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks?market=US"
+# you need user authentication to get the playlist id
+def get_playlist_info(playlist_id, token):
+    url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
     response = requests.get(url, headers=get_auth_header(token))
 
     if response.status_code != 200:
-        print("Error:", response.status_code)
-        print("Response:", response.text)
+        print("Error: ", response.status_code)
         return None
-    else:
-        json_response = json.loads(response.content)
-        tracks = parse_top_tracks(json_response)
-        for track in tracks:
-            print(f"Track Name: {track['name']}")
-            print(f"Artists: {', '.join(track['artists'])}")
-            print(f"URL: {track['url']}")
-            print()
-    return None
     
-token = get_token()
-if token is None:
-    print("Failed to get token")
-else:
-    print(get_global_top_tracks(token))
+    json_response = json.loads(response.content)
+
+    # return a list of track ids in this playlist
+
+    track_id_list = []
+    for item in json_response["items"]:
+        track_id_list.append(item["track"]["id"])
+
+    return track_id_list

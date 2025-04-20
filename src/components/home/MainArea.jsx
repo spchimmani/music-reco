@@ -10,6 +10,28 @@ const MainArea = () => {
   const [topCharts, setTopCharts] = useState([]);
   const { playTrackWithQueue } = useContext(MusicPlayerContext);
 
+  // Fetch user playlist data
+  const fetchUserPlaylist = async () => {
+    try {
+      const access_token = localStorage.getItem("access_token"); // or wherever you stored it after login
+
+      const response = await axios.get('http://localhost:8000/myplaylist', {
+        params: { access_token }
+      });
+      console.log("User Playlist data:", response.data);
+      // Process the user playlist data as needed
+      // if response.data results in error then handle it
+      if (response.data.error) {
+        console.error("Error fetching user playlist:", response.data.error);
+        // Handle the error accordingly
+      } else {
+        setTopCharts(response.data.tracks); // Assuming the response contains the playlist data
+      }
+    } catch (error) {
+      console.error("Error fetching user playlist:", error);
+    }
+  };
+
   const fetchGenreRecommendations = async () => {
     try {
       const genres = ['rnb'];
@@ -20,7 +42,7 @@ const MainArea = () => {
         paramsSerializer: params => qs.stringify(params, { arrayFormat: 'repeat' })
       });
 
-      console.log("Response data:", response.data);
+      console.log("Genre Response data:", response.data);
       setGenreRecs(response.data.coldstart_genre_recos);
     } catch (error) {
       console.error("Error fetching genre recommendations:", error);
@@ -37,7 +59,7 @@ const MainArea = () => {
         paramsSerializer: params => qs.stringify(params, { arrayFormat: 'repeat' })
       });
 
-      console.log("Response data:", response.data);
+      console.log("Artist Response data:", response.data);
       setArtistRecs(response.data.coldstart_artist_recos);
     } catch (error) {
       console.error("Error fetching artist recommendations:", error);
@@ -46,16 +68,9 @@ const MainArea = () => {
 
   useEffect(() => {
     // Simulate fetching cold-start recommendations by genre
+    fetchUserPlaylist();
     fetchGenreRecommendations();
     fetchArtistRecommendations();
-
-    // Simulate fetching cold-start recommendations for top charts
-    setTopCharts([
-      { id: 1, name: 'Top Song A', image: 'topSongA.jpg' },
-      { id: 2, name: 'Top Song B', image: 'topSongB.jpg' },
-      { id: 3, name: 'Top Song C', image: 'topSongC.jpg' },
-      { id: 4, name: 'Top Song D', image: 'topSongD.jpg' }
-    ]);
   }, []);
 
   return (
@@ -63,12 +78,12 @@ const MainArea = () => {
       <section className="cold-start">
         <h2>Top Charts</h2>
         <div className="recommendation-row topcharts-row">
-          {topCharts.map((item) => (
-            <div key={item.id} className="recommendation-card" onClick={() => playTrackWithQueue({
+          {topCharts.map((item, index) => (
+            <div key={item.id || `top-${index}`} className="recommendation-card" onClick={() => playTrackWithQueue({
               title: item.name,
               artist: 'Unknown Artist',
               albumArt: item.image,
-              duration: 180
+              duration: item.duration || 180
             })}>
               <img src={item.image} alt={item.name} className="recommendation-image" />
               <h3>{item.name}</h3>
@@ -80,8 +95,8 @@ const MainArea = () => {
       <section className="cold-start">
         <h2>Genre Recommendations</h2>
         <div className="recommendation-row genre-row">
-          {genreRecs.map((item) => (
-            <div key={item.id} className="recommendation-card" onClick={() => playTrackWithQueue({
+          {genreRecs.map((item, index) => (
+            <div key={item.id || `genre-${index}`} className="recommendation-card" onClick={() => playTrackWithQueue({
               title: item.name,
               artist: item.artist || 'Unknown Artist',
               albumArt: item.image,
@@ -97,8 +112,8 @@ const MainArea = () => {
       <section className="cold-start">
         <h2>Artist Recommendations</h2>
         <div className="recommendation-row artist-row">
-          {artistRecs.map((item) => (
-            <div key={item.id} className="recommendation-card" onClick={() => playTrackWithQueue({
+          {artistRecs.map((item, index) => (
+            <div key={item.id || `artist-${index}`} className="recommendation-card" onClick={() => playTrackWithQueue({
               title: item.name,
               artist: item.artist || 'Unknown Artist',
               albumArt: item.image,

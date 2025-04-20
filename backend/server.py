@@ -1,6 +1,9 @@
+import os
+import logging
 from typing import List
 import fastapi
 from pydantic import BaseModel
+import requests
 import uvicorn
 from spotify_api import get_token, get_artist_id, get_artist_image, get_track_info
 from fastapi.middleware.cors import CORSMiddleware
@@ -13,8 +16,9 @@ app.add_middleware(
     allow_methods=["*"],  # Allow all HTTP methods (GET, POST, etc.)
     allow_headers=["*"],  # Allow all headers
 )
-
-#define a pydantic model for user-preferences regarding his favorite artists and genres
+logging.basicConfig(level=logging.INFO)
+class CodePayload(BaseModel):
+    code: str
 
 token = get_token()
 
@@ -98,4 +102,68 @@ def get_coldstart_artist_reco(user_artists: List[str] = fastapi.Query(...)):
     boosted_artist_recos_converted = convert_recommendations(boosted_artist_recos)
     return {
         "coldstart_artist_recos": boosted_artist_recos_converted
+    }
+
+@app.post("/spotify/callback")
+def exchange_code(payload: CodePayload):
+    code = payload.code
+    if not code:
+        return {"error": "No code provided"}
+    else:
+        print("Code received: ", code)
+
+    url = "https://accounts.spotify.com/api/token"
+    data = {
+        "grant_type": "authorization_code",
+        "code": code,
+        "redirect_uri": "http://localhost:3000/callback",
+        "client_id": os.getenv("CLIENT_ID"),
+        "client_secret": os.getenv("CLIENT_SECRET"),
+    }
+
+    response = requests.post(url, data=data)
+    token_data = response.json()
+
+    if "access_token" not in token_data:
+        return {"error": token_data}
+
+    print("Token exchange successful")
+    access_token = token_data.get("access_token")
+    refresh_token = token_data.get("refresh_token")
+
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token
+    }
+
+@app.get("/myplaylist")
+def get_user_playlists(access_token: str):
+    url = "https://api.spotify.com/v1/playlists/2gTviv8U0wJuPrFtf6o6f6/tracks"
+    headers = {
+        "Authorization": f"Bearer {access_token}"
+    }
+
+    response = requests.get(url, headers=headers)
+    if response.status_code != 200:
+        print("Error: ", response.status_code)
+        return {"error": response.text}
+    else:
+        print("Top charts fetched successfully")
+    # Extract the track information from the response
+    
+    data = response.json()
+    tracks = data.get("items", [])
+    # Extract relevant information from each track
+    track_info = []
+    for item in tracks:
+        track = item.get("track", {})
+        track_info.append({
+            "name": track.get("name"),
+            "artist": track.get("artists", [{}])[0].get("name"),
+            "image": track.get("album", {}).get("images", [{}])[0].get("url"),
+            "duration": track.get("duration_ms"),
+        })
+
+    return {
+        "tracks": track_info
     }
