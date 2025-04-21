@@ -81,7 +81,7 @@ const MainArea = () => {
           {topCharts.map((item, index) => (
             <div key={item.id || `top-${index}`} className="recommendation-card" onClick={() => playTrackWithQueue({
               title: item.name,
-              artist: 'Unknown Artist',
+              artist: item.artist || 'Unknown Artist',
               albumArt: item.image,
               duration: item.duration || 180
             })}>

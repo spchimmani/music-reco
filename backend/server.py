@@ -4,10 +4,9 @@ from typing import List
 import fastapi
 from pydantic import BaseModel
 import requests
-import uvicorn
 from spotify_api import get_token, get_artist_id, get_artist_image, get_track_info
 from fastapi.middleware.cors import CORSMiddleware
-from cold_start_reco import get_user_genre_recommendations, get_boosted_user_artist_recommendations
+from coldstart_reco.cold_start_reco import get_user_genre_recommendations, get_boosted_user_artist_recommendations
 app = fastapi.FastAPI()
 app.add_middleware(
     CORSMiddleware,
