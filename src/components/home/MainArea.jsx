@@ -74,7 +74,7 @@ const MainArea = () => {
   }, []);
 
   return (
-    <main className="main-content">
+    <main className="main-content" style={{ flex: 1 }}>
       <section className="cold-start">
         <h2>Top Charts</h2>
         <div className="recommendation-row topcharts-row">
@@ -91,7 +91,7 @@ const MainArea = () => {
           ))}
         </div>
       </section>
-
+ 
       <section className="cold-start">
         <h2>Genre Recommendations</h2>
         <div className="recommendation-row genre-row">
@@ -108,7 +108,7 @@ const MainArea = () => {
           ))}
         </div>
       </section>
-
+ 
       <section className="cold-start">
         <h2>Artist Recommendations</h2>
         <div className="recommendation-row artist-row">

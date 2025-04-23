@@ -107,6 +107,7 @@ body {
   margin-top: 60px;      /* Offset to account for fixed top-bar */
   width: 100vw;          /* Fixed to viewport width */
   overflow-x: hidden;    /* Prevent horizontal shifting */
+  align-items: flex-start; /* Ensure vertical alignment for children */
 }
 
 /* SIDEBAR */
@@ -117,6 +118,19 @@ body {
   overflow-y: auto;        /* Vertical scroll if needed */
   padding: 20px;
   flex-shrink: 0;          /* Do not shrink the sidebar */
+}
+
+/* NEXT PLAYING SIDEBAR */
+.next-playing {
+  width: 0;
+  opacity: 0;
+  transition: width 0.3s ease, opacity 0.3s ease;
+  overflow: hidden;
+}
+
+.next-playing.show {
+  width: 250px;
+  opacity: 1;
 }
 
 /* MAIN CONTENT AREA */

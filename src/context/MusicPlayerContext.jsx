@@ -9,16 +9,37 @@ export const MusicPlayerProvider = ({ children }) => {
     albumArt: 'https://via.placeholder.com/60x60.png?text=Test',
     duration: 180
   });
-  const [queue, setQueue] = useState([]);
+  const [showQueue, setShowQueue] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [reaction, setReaction] = useState('none');
   const [currentTime, setCurrentTime] = useState(0);
+  const [queue, setQueue] = useState([
+    {
+      title: 'Dummy Song 1',
+      artist: 'Dummy Artist',
+      albumArt: 'https://via.placeholder.com/60x60.png?text=1',
+      duration: 200
+    },
+    {
+      title: 'Dummy Song 2',
+      artist: 'Dummy Artist',
+      albumArt: 'https://via.placeholder.com/60x60.png?text=2',
+      duration: 180
+    },
+    {
+      title: 'Dummy Song 3',
+      artist: 'Dummy Artist',
+      albumArt: 'https://via.placeholder.com/60x60.png?text=3',
+      duration: 240
+    }
+  ]);
 
   const playTrackWithQueue = (selectedTrack) => {
     setCurrentTrack(selectedTrack);
     setIsPlaying(true);
     setReaction('none');
     setCurrentTime(0);
+    setQueue([selectedTrack]); // Replace this with actual queue logic later
   };
 
   useEffect(() => {
@@ -38,15 +59,17 @@ export const MusicPlayerProvider = ({ children }) => {
       value={{
         currentTrack,
         setCurrentTrack,
-        queue,
-        setQueue,
+        showQueue,
+        setShowQueue,
         isPlaying,
         setIsPlaying,
         reaction,
         setReaction,
         currentTime,
         setCurrentTime,
-        playTrackWithQueue
+        playTrackWithQueue,
+        queue,
+        setQueue,
       }}
     >
       {children}

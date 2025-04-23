@@ -9,7 +9,9 @@ function ModernMusicFooter() {
     reaction,
     setReaction,
     currentTime,
-    setCurrentTime
+    setCurrentTime,
+    showQueue,
+    setShowQueue,
   } = useContext(MusicPlayerContext);
 
 
@@ -101,6 +103,15 @@ function ModernMusicFooter() {
       {/* Center Section: Playback Controls and Progress */}
       <div style={styles.middleSection}>
         <div style={styles.controlsContainer}>
+          <button onClick={() => {
+            setShowQueue(prev => {
+              const newVal = !prev;
+              console.log('Toggling showQueue to:', newVal);
+              return newVal;
+            });
+          }} style={styles.controlBtn}>
+            📜
+          </button>
           <button onClick={handlePrev} style={styles.controlBtn}>
             ⏮
           </button>
