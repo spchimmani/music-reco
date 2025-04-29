@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
-
+import axios from 'axios';
 export const MusicPlayerContext = createContext();
 
 export const MusicPlayerProvider = ({ children }) => {
@@ -34,12 +34,39 @@ export const MusicPlayerProvider = ({ children }) => {
     }
   ]);
 
-  const playTrackWithQueue = (selectedTrack) => {
+  const playTrackWithQueue = async (selectedTrack) => {
     setCurrentTrack(selectedTrack);
     setIsPlaying(true);
     setReaction('none');
     setCurrentTime(0);
-    setQueue([selectedTrack]); // Replace this with actual queue logic later
+    
+    try {
+      console.log("Selected Track Id:", selectedTrack);
+      const access_token = localStorage.getItem("access_token");
+
+      const response = await axios.get('http://localhost:8000/next_tracks', {
+        params: {
+          track_id: selectedTrack.track_id,
+          access_token: access_token,
+        },
+      });
+
+      console.log("Next Tracks Response:", response.data);
+
+      const recommendedTracks = response.data.tracks.map(track => ({
+        title: track.name,
+        artist: track.artist || 'Unknown Artist',
+        albumArt: track.image,
+        duration: track.duration || 180,
+      }));
+
+      // Put the selected track first, then the recommended ones
+      setQueue([selectedTrack, ...recommendedTracks]);
+    } catch (error) {
+      console.error("Error fetching next tracks:", error);
+      // Fallback: Just play the selected track alone
+      setQueue([selectedTrack]);
+    }
   };
 
   useEffect(() => {

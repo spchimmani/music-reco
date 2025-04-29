@@ -4,7 +4,7 @@ from typing import List
 import fastapi
 from pydantic import BaseModel
 import requests
-from spotify_api import get_token, get_artist_id, get_artist_image, get_track_info
+from spotify_api import get_token, get_artist_id, get_artist_image, get_track_info, next_tracks
 from fastapi.middleware.cors import CORSMiddleware
 from coldstart_reco.cold_start_reco import get_user_genre_recommendations, get_boosted_user_artist_recommendations
 app = fastapi.FastAPI()
@@ -56,6 +56,7 @@ def get_coldstart_genre_reco(user_genres: List[str] = fastapi.Query(...)):
             track_info = get_track_info(spotify_track_id, token)
             recommendations.append({
                 'id': idx,           # Simple index starting at 1.
+                'track_id': spotify_track_id,  # Spotify track ID.
                 'name': row['name'],
                 'image': track_info["album"]["images"][0]["url"],  # Image URL from the track info.
                 'artist': row['artist'],
@@ -89,6 +90,7 @@ def get_coldstart_artist_reco(user_artists: List[str] = fastapi.Query(...)):
             track_info = get_track_info(spotify_track_id, token)
             recommendations.append({
                 "id": idx,       # Sequential index starting at 1.
+                "track_id": spotify_track_id,  # Spotify track ID.
                 "name": track_info["name"],
                 "image": track_info["album"]["images"][0]["url"],  # Image URL from the track info.
                 "duration": track_info["duration_ms"],  # Duration in milliseconds.
@@ -137,7 +139,20 @@ def exchange_code(payload: CodePayload):
 
 @app.get("/myplaylist")
 def get_user_playlists(access_token: str):
-    url = "https://api.spotify.com/v1/playlists/2gTviv8U0wJuPrFtf6o6f6/tracks"
+    url = "https://api.spotify.com/v1/me/playlists"
+    headers = {
+        "Authorization": f"Bearer {access_token}"
+    }
+    response = requests.get(url, headers=headers)
+    if response.status_code != 200:
+        print("Error: ", response.status_code)
+        return {"error": response.text}
+    else:
+        # check if user has any playlists
+        if not response.json().get("items"):
+            return {"error": "No playlists found"}
+        playlist_id = response.json()["items"][0]["id"]
+    url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
     headers = {
         "Authorization": f"Bearer {access_token}"
     }
@@ -157,12 +172,33 @@ def get_user_playlists(access_token: str):
     for item in tracks:
         track = item.get("track", {})
         track_info.append({
+            "track_id": track.get("id"),
             "name": track.get("name"),
             "artist": track.get("artists", [{}])[0].get("name"),
             "image": track.get("album", {}).get("images", [{}])[0].get("url"),
             "duration": track.get("duration_ms"),
         })
-
     return {
         "tracks": track_info
     }
+
+@app.get("/next_tracks")
+def get_next_tracks(track_id: str, access_token: str):
+    print("Trying to get next tracks...")
+    tracks = next_tracks(track_id, access_token)
+    if not tracks:
+        return {"error": "No next tracks found"}
+    # format tracks to return track id, name, artist, image, duration
+    track_info = []
+    for item in tracks:
+        track_info.append({
+            "track_id": item["id"],
+            "name": item["name"],
+            "artist": item["artists"][0]["name"],
+            "image": item["album"]["images"][0]["url"],
+            "duration": item["duration_ms"],
+        })
+    return {
+        "tracks": track_info
+    }
+    

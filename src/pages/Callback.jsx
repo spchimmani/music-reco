@@ -20,7 +20,7 @@ function Callback() {
           localStorage.setItem("access_token", res.data.access_token);
           localStorage.setItem("refresh_token", res.data.refresh_token);
           // Redirect to home page or wherever you want
-          navigate("/home");
+          navigate("/music-preferences");
         }
       });
     }

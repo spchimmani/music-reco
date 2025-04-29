@@ -3,7 +3,6 @@ from dotenv import load_dotenv
 import os
 import requests
 import base64
-import urllib.parse
 load_dotenv()
 
 spotify_client_id = os.getenv("CLIENT_ID")
@@ -126,3 +125,24 @@ def get_playlist_info(playlist_id, token):
         track_id_list.append(item["track"]["id"])
 
     return track_id_list
+
+def next_tracks(track_id, token):
+    url = "https://api.spotify.com/v1/recommendations?seed_artists=4NHQUGzhtTLFvgF5SZesLK&seed_genres=classical%2Ccountry&seed_tracks=0c6xIDDpzE81m2q797ordA"
+    params = {
+        "seed_tracks": track_id,
+        "market": "US",
+        "limit": 10
+    }
+    response = requests.get(url, headers=get_auth_header(token))
+    # response = requests.get(url, headers=get_auth_header(token), params=params)
+
+    if response.status_code != 200:
+        print("Error: ", response.status_code)
+        print("Message: ", response.text)
+        return None
+    
+    json_response = json.loads(response.content)
+    return json_response["tracks"]
+
+
+print(next_tracks("0c6xIDDpzE81m2q797ordA", get_token()))
