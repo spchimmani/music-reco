@@ -42,12 +42,11 @@ export const MusicPlayerProvider = ({ children }) => {
     
     try {
       console.log("Selected Track Id:", selectedTrack);
-      const access_token = localStorage.getItem("access_token");
 
       const response = await axios.get('http://localhost:8000/next_tracks', {
         params: {
-          track_id: selectedTrack.track_id,
-          access_token: access_token,
+          track_name: selectedTrack.title,
+          artist_name: selectedTrack.artist,
         },
       });
 

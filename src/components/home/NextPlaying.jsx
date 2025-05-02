@@ -4,7 +4,7 @@ import React, { useContext, useEffect } from 'react';
 import { MusicPlayerContext } from '../../context/MusicPlayerContext';
 
 const NextPlaying = ({ className }) => {
-  const { queue, currentTrack } = useContext(MusicPlayerContext);
+  const { queue, currentTrack, playTrackWithQueue } = useContext(MusicPlayerContext);
 
   const nextSongs = queue.filter(song => song.title !== currentTrack?.title);
 
@@ -22,7 +22,7 @@ const NextPlaying = ({ className }) => {
           <p style={styles.empty}>No upcoming songs</p>
         ) : (
           nextSongs.map((song, index) => (
-            <div key={index} style={styles.songCard}>
+            <div key={index} style={styles.songCard} onClick={() => playTrackWithQueue(song)}>
               <img src={song.albumArt} alt={song.title} style={styles.albumArt} />
               <div>
                 <div style={styles.songTitle}>{song.title}</div>

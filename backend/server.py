@@ -4,7 +4,8 @@ from typing import List
 import fastapi
 from pydantic import BaseModel
 import requests
-from spotify_api import get_token, get_artist_id, get_artist_image, get_track_info, next_tracks
+from lastfm_api import get_similar_tracks
+from spotify_api import get_token, get_artist_id, get_artist_image, get_track_id_by_name_artist, get_track_info
 from fastapi.middleware.cors import CORSMiddleware
 from coldstart_reco.cold_start_reco import get_user_genre_recommendations, get_boosted_user_artist_recommendations
 app = fastapi.FastAPI()
@@ -118,8 +119,8 @@ def exchange_code(payload: CodePayload):
         "grant_type": "authorization_code",
         "code": code,
         "redirect_uri": "http://localhost:3000/callback",
-        "client_id": os.getenv("CLIENT_ID"),
-        "client_secret": os.getenv("CLIENT_SECRET"),
+        "client_id": os.getenv("SPOTIFY_CLIENT_ID"),
+        "client_secret": os.getenv("SPOTIFY_CLIENT_SECRET"),
     }
 
     response = requests.post(url, data=data)
@@ -183,22 +184,25 @@ def get_user_playlists(access_token: str):
     }
 
 @app.get("/next_tracks")
-def get_next_tracks(track_id: str, access_token: str):
+def get_next_tracks(track_name: str, artist_name: str):
     print("Trying to get next tracks...")
-    tracks = next_tracks(track_id, access_token)
+    tracks = get_similar_tracks(track_name, artist_name, limit=20)
+    
     if not tracks:
         return {"error": "No next tracks found"}
     # format tracks to return track id, name, artist, image, duration
-    track_info = []
-    for item in tracks:
-        track_info.append({
-            "track_id": item["id"],
-            "name": item["name"],
-            "artist": item["artists"][0]["name"],
-            "image": item["album"]["images"][0]["url"],
-            "duration": item["duration_ms"],
+    final_tracks = []
+    for track in tracks:
+        track_id = get_track_id_by_name_artist(track["name"], track["artist"], token)
+        track_info = get_track_info(track_id, token)
+        final_tracks.append({
+            "name": track_info["name"],
+            "artist": track_info["artists"][0]["name"],
+            "image": track_info["album"]["images"][0]["url"],
+            "duration": track_info["duration_ms"],
         })
+
     return {
-        "tracks": track_info
+        "tracks": final_tracks
     }
     
