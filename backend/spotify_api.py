@@ -5,8 +5,8 @@ import requests
 import base64
 load_dotenv()
 
-spotify_client_id = os.getenv("CLIENT_ID")
-spotify_client_secret = os.getenv("CLIENT_SECRET")
+spotify_client_id = os.getenv("SPOTIFY_CLIENT_ID")
+spotify_client_secret = os.getenv("SPOTIFY_CLIENT_SECRET")
 
 def get_token():
     auth_string = f"{spotify_client_id}:{spotify_client_secret}"
@@ -126,23 +126,17 @@ def get_playlist_info(playlist_id, token):
 
     return track_id_list
 
-def next_tracks(track_id, token):
-    url = "https://api.spotify.com/v1/recommendations?seed_artists=4NHQUGzhtTLFvgF5SZesLK&seed_genres=classical%2Ccountry&seed_tracks=0c6xIDDpzE81m2q797ordA"
-    params = {
-        "seed_tracks": track_id,
-        "market": "US",
-        "limit": 10
-    }
+def get_track_id_by_name_artist(track_name, artist_name, token):
+    query = f"{track_name} artist:{artist_name}"
+    url = f"https://api.spotify.com/v1/search?q={query}&type=track&limit=1"
     response = requests.get(url, headers=get_auth_header(token))
-    # response = requests.get(url, headers=get_auth_header(token), params=params)
 
     if response.status_code != 200:
-        print("Error: ", response.status_code)
-        print("Message: ", response.text)
+        print("Error:", response.status_code)
         return None
-    
+
     json_response = json.loads(response.content)
-    return json_response["tracks"]
-
-
-print(next_tracks("0c6xIDDpzE81m2q797ordA", get_token()))
+    tracks = json_response.get("tracks", {}).get("items", [])
+    if not tracks:
+        return None
+    return tracks[0]["id"]
